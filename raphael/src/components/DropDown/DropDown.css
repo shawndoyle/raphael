@@ -1,0 +1,17 @@
+#drop-down-menu {
+	background-color: grey;
+	text-align: left;
+	margin: 0;
+	padding: 5px 0;
+}
+
+#drop-down-menu li {
+	list-style: none;
+	margin: 5px 0;
+	color: white;
+}
+
+#drop-down-menu li:hover {
+	cursor: pointer;
+	color: lime;
+}

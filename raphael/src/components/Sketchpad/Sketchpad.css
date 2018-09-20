@@ -1,0 +1,13 @@
+#sketchpad-wrap {
+	border: 1px solid black;
+	box-shadow: 5px;
+	max-width: 700px;
+	min-width: 300px;
+	flex-grow: 1;
+	height: 600px;
+}
+
+#sketchpad-wrap canvas {
+	width: 100%;
+	height: 100%;
+}
