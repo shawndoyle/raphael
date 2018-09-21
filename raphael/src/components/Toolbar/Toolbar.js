@@ -32,6 +32,7 @@ class Toolbar extends Component {
 			{name: 'Delete', fn: () => console.log('Delete')},
 		],
 		'Edit': [
+			{name: 'Undo', fn: () => console.log('Undo')},
 			{name: 'Rotate', fn: () => console.log('Rotate')},
 			{name: 'Mirror', fn: () => console.log('Mirror')},
 			{name: 'Clear', fn: () => console.log('Clear')},

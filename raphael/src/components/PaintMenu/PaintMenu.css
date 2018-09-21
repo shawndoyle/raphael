@@ -1,12 +1,49 @@
 #paint-menu {
-	height: 600px;
-	width: 300px;
-	margin: 0 15px;
-	background-color: lightgrey;
-	border-radius: 20px;
-	padding: 10px;
+  height: 580px;
+  width: 300px;
+  margin: 0 15px;
+  border-radius: 20px;
+  padding: 10px;
+  background-color: sienna;
+  color: white;
+  font-size: 20px;
 }
 
+#tool-menu button {
+  height: 40px;
+  width: 40px;
+  margin: 10px;
+  padding-top: 3px;
+  font-size: 25px;
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  border: 0px; 
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.15) 0px 8px 16px;  
+}
+
+#brush-menu {
+  margin: 30px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgb(255, 255, 255);
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.15) 0px 8px 16px;
+}
+
+#brush-circle {
+  background: black;
+  border-radius: 100%;
+  min-width: 2px;
+  min-height: 2px;
+}
+
+#color-menu {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
 
 
 .input-range__slider {
