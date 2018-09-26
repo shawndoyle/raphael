@@ -17,7 +17,6 @@ class App extends Component {
         rgb: { r:0, g:0, b:0, a:0 }
       },
       undoDisabled: true,
-
     }
   }
 
@@ -161,7 +160,9 @@ class App extends Component {
   }
 
   //Flood fill algorithm
-  fill = ({startX, startY}) => {
+  fill = ({x, y}) => {
+    let startX = x
+    let startY = y
     const {canvas, context} = this.state
 
     const replacementColor = this.state.color.rgb

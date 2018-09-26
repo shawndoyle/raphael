@@ -22,28 +22,6 @@ class Toolbar extends Component {
 		}
 	}
 
-	dropDownOptions = {
-		'None': [],
-		'File': [
-			{name: 'Download', fn: () => console.log('Download')},
-			{name: 'New', fn: () => console.log('New')},
-			{name: 'Open', fn: () => console.log('Open')},
-			{name: 'Save', fn: () => console.log('Save')},
-			{name: 'Delete', fn: () => console.log('Delete')},
-		],
-		'Edit': [
-			{name: 'Undo', fn: () => this.props.undo(), disabled: this.props.undoDisabled},
-			{name: 'Rotate', fn: () => console.log('Rotate')},
-			{name: 'Mirror', fn: () => console.log('Mirror')},
-			{name: 'Clear', fn: () => console.log('Clear')},
-		],
-		'Account': [
-			{name: 'Security', fn: () => console.log('Secutity')},
-			{name: 'View Files', fn: () => console.log('View Files')},			
-		],
-	}
-
-
 	render() {
 		return (
 			<div>
@@ -55,7 +33,9 @@ class Toolbar extends Component {
 					</ul>
 				</nav>
 				<DropDown 
-			        options={this.dropDownOptions[this.state.dropDownTarget]}
+			        selected={this.state.dropDownTarget}
+			        undo={this.props.undo}
+			        undoDisabled={this.props.undoDisabled}
 			    />
 			</div>
 		)

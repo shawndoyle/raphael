@@ -1,7 +1,7 @@
 import React from 'react'
 import './Sketchpad.css'
 
-const Sketchpad = ({draw, beginDrawing, endDrawing}) => {
+const Sketchpad = ({draw, beginDrawing, endDrawing, filling}) => {
 
 	return (
 		<div className='shadow' id='sketchpad-wrap'>

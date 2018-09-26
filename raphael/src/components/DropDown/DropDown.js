@@ -1,21 +1,73 @@
 import React from 'react'
 import './DropDown.css'
 
-const DropDown = ({options}) => {
-	const menuOptions = options.map(opt => {
-		return <li 
-			onClick={opt.fn} 
-			key={opt.name} 
-			style={opt.disabled ? {color: '#000', cursor: 'default'} : {}}
-		>{opt.name}</li>
-	})
-	return(
-		<nav id='drop-down-menu'>
-			<ul>
-				{menuOptions}
-			</ul>
-		</nav>
-	)
+const DropDown = ({selected, undo, undoDisabled}) => {
+	if(selected === 'File') {
+		return(
+			<nav id='drop-down-menu'>
+				<ul>
+					<li 
+						key='Download'
+						onClick={console.log}
+					>Download</li>
+					<li 
+						key='New'
+						onClick={console.log}
+					>New</li>
+					<li 
+						key='Open'
+						onClick={console.log}
+					>Open</li>
+					<li 
+						key='Save'
+						onClick={console.log}
+					>Save</li>
+				</ul>
+			</nav>
+		)
+	}
+	if(selected === 'Edit') {
+		return(
+			<nav id='drop-down-menu'>
+				<ul>
+					<li 
+						key='Undo'
+						onClick={undo}
+						style={undoDisabled ? {color: '#000', cursor: 'default'} : {}}
+					>Undo</li>
+					<li 
+						key='Rotate'
+						onClick={console.log}
+					>Rotate</li>
+					<li 
+						key='Mirror'
+						onClick={console.log}
+					>Mirror</li>
+					<li 
+						key='Clear'
+						onClick={console.log}
+					>Clear</li>
+				</ul>
+			</nav>
+		)		
+	}
+	if(selected === 'Account') {
+		return(
+			<nav id='drop-down-menu'>
+				<ul>
+					<li 
+						key='View-Files'
+						onClick={console.log}
+					>View Files</li>
+					<li 
+						key='Account-Settings'
+						onClick={console.log}
+					>Account Settings</li>
+				</ul>
+			</nav>
+		)
+	}
+	return <div style={{display: 'none'}}></div>
 }
 
 export default DropDown

@@ -3,5 +3,7 @@
 	box-shadow: 5px;
 	width: 600px;
 	height: 600px;
+	padding: 0;
+	z-index: 1;
 }
 
