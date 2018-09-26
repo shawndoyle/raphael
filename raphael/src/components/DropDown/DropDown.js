@@ -3,7 +3,11 @@ import './DropDown.css'
 
 const DropDown = ({options}) => {
 	const menuOptions = options.map(opt => {
-		return <li onClick={opt.fn} key={opt.name}>{opt.name}</li>
+		return <li 
+			onClick={opt.fn} 
+			key={opt.name} 
+			style={opt.disabled ? {color: '#000', cursor: 'default'} : {}}
+		>{opt.name}</li>
 	})
 	return(
 		<nav id='drop-down-menu'>

@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import _ from 'lodash'
 import Toolbar from './components/Toolbar/Toolbar'
 import Sketchpad from './components/Sketchpad/Sketchpad'
 import PaintMenu from './components/PaintMenu/PaintMenu'
@@ -15,13 +16,18 @@ class App extends Component {
         hex: '#000',
         rgb: { r:0, g:0, b:0, a:0 }
       },
+      undoDisabled: true,
+
     }
   }
 
   render() {
     return (
       <div className="App">
-        <Toolbar />
+        <Toolbar 
+          undo={this.undo}
+          undoDisabled={this.state.undoDisabled}
+        />
         <div id='workspace'>
           <Sketchpad 
             draw={this.draw}
@@ -76,11 +82,16 @@ class App extends Component {
     let {context} = this.state
     context.beginPath()
     context.moveTo(coords.x, coords.y)
-    this.setState({drawing: true, startCoords: coords})
 
     //Makes copy of the canvas before the drawing takes place
     let {copyContext, canvas} = this.state
     copyContext.drawImage(canvas, 0, 0)
+
+    this.setState({drawing: true, startCoords: coords, undoDisabled: false})
+
+    if(this.state.tool === 'fill') {
+      this.fill(coords)
+    }
   }
 
   //Activates on MouseUp event
@@ -103,9 +114,6 @@ class App extends Component {
           break
         case 'circle':
           this.circle(coords)
-          break
-        case 'fill':
-          this.fill(coords)
           break
         default:
           break
@@ -152,81 +160,65 @@ class App extends Component {
     context.fill()
   }
 
-  fill = ({x, y}) => {
-    const newColor = this.state.color.rgb
+  //Flood fill algorithm
+  fill = ({startX, startY}) => {
     const {canvas, context} = this.state
+
+    const replacementColor = this.state.color.rgb
+    replacementColor.a *= 255 //Canvas images use a 0-255 scale; color picker returns a 0-1
+
     //Loads entire image data
     let image = context.getImageData(0, 0, canvas.width, canvas.height)
-    //Store selected data
-    const startPos = (y * canvas.width + x) * 4
-    const startR = image.data[startPos]
-    const startG = image.data[startPos + 1]
-    const startB = image.data[startPos + 2]
 
+    const targetColor = colorOf(pos(startX, startY))
 
-    const pixelStack = [[x, y]]
-    while(pixelStack.length) {
-      let newPos = pixelStack.pop()
-      x = newPos[0]
-      y = newPos[1]
-      let pixelPos = getPixelPosition(x, y)
-      while(y-- > 0 && matchStartColor(pixelPos)) {
-        pixelPos = getPixelPosition(x, y)
-      }
-      y++
-      console.log(x, y)
-      let reachLeft = false
-      let reachRight = false
-      while(y < canvas.height - 1 && matchStartColor(pixelPos)) {
-        // image = colorPixel(pixelPos)
-        // if(x > 0) {
-        //   if(matchStartColor(pixelPos - 4)) {
-        //     if(!reachLeft) {
-        //       pixelStack.push([x - 1, y])
-        //       reachLeft = true
-        //     }
-        //   } else if(reachLeft) {
-        //     reachLeft = false
-        //   }
-        // }
-        // if(x < canvas.width - 1) {
-        //   if(matchStartColor(pixelPos + 4)) {
-        //     if(!reachRight) {
-        //       pixelStack.push([x + 1, y])
-        //       reachRight = true
-        //     }
-        //   } else if(reachRight) {
-        //     reachRight = false
-        //   }
-        // }
-        y++
-        pixelPos = getPixelPosition(x, y)
-        // console.log(pixelPos)
+    if(!_.isEqual(targetColor, replacementColor)) {
+      let nodeQueue = []
+      nodeQueue.push([startX, startY])
+      while(nodeQueue.length) {
+        let [x, y] = nodeQueue.pop()
+        //Find furthest West and East points within area
+        let w = x
+        while(w > 0 && _.isEqual(colorOf(pos(w, y)), targetColor)) {
+          w--
+        }
+        let e = x
+        while(e < canvas.width && _.isEqual(colorOf(pos(e, y)), targetColor)) {
+          e++
+        }
+
+        for(let i = w; i <= e; i++) {
+          //Color node
+          image.data[pos(i, y)] = replacementColor.r
+          image.data[pos(i, y) + 1] = replacementColor.g
+          image.data[pos(i, y) + 2] = replacementColor.b
+          image.data[pos(i, y) + 3] = replacementColor.a
+
+          //Check if North and South nodes need to be added to queue
+          if(_.isEqual(colorOf(pos(i, y - 1)), targetColor) && y >= 0) {
+            nodeQueue.push([i, y - 1])
+          }
+          if(_.isEqual(colorOf(pos(i, y + 1)), targetColor) && y < canvas.width - 1) {
+            nodeQueue.push([i, y + 1])
+          }
+        }
       }
     }
-
 
     this.wipe(canvas, context)
     context.putImageData(image, 0, 0)
 
-    function colorPixel(pixelPos) {
-      image.data[pixelPos] = newColor.r
-      image.data[pixelPos + 1] = newColor.g
-      image.data[pixelPos + 2] = newColor.b
-      image.data[pixelPos + 3] = newColor.a * 255
-      return image
-    }
-
-    function getPixelPosition(x, y) {
+    function pos(x, y) {
       return (y * canvas.width + x) * 4
     }
 
-    function matchStartColor(pixelPos){
-      let r = image.data[pixelPos]
-      let g = image.data[pixelPos + 1]
-      let b = image.data[pixelPos + 2]
-      
-      return (r === startR && g === startG && b === startB)
+    function colorOf(n) {
+      return {
+        r: image.data[n],
+        g: image.data[n + 1],
+        b: image.data[n + 2],
+        a: image.data[n + 3]
+      }
     }
   }
 
@@ -245,6 +237,16 @@ class App extends Component {
     this.setState({tool: value})
     let {copyContext, canvas} = this.state
     copyContext.drawImage(canvas, 0, 0)
+  }
+
+  undo = () => {
+    console.log('test')
+    if(!this.state.undoDisabled) {
+      const {canvas, context, copyCanvas} = this.state
+      this.wipe(canvas, context)
+      context.drawImage(copyCanvas, 0, 0)
+      this.setState({undoDisabled: true})
+    }
   }
 }
 
