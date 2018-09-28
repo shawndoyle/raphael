@@ -1,7 +1,7 @@
 import React from 'react'
 import './DropDown.css'
 
-const DropDown = ({selected, undo, undoDisabled}) => {
+const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH}) => {
 	if(selected === 'File') {
 		return(
 			<nav id='drop-down-menu'>
@@ -37,15 +37,19 @@ const DropDown = ({selected, undo, undoDisabled}) => {
 					>Undo</li>
 					<li 
 						key='Rotate'
-						onClick={console.log}
+						onClick={rotate}
 					>Rotate</li>
 					<li 
-						key='Mirror'
-						onClick={console.log}
-					>Mirror</li>
+						key='Flip-Vertically'
+						onClick={flipV}
+					>Flip Vertically</li>
+					<li 
+						key='Flip-Horizontally'
+						onClick={flipH}
+					>Flip Horizontally</li>
 					<li 
 						key='Clear'
-						onClick={console.log}
+						onClick={clear}
 					>Clear</li>
 				</ul>
 			</nav>

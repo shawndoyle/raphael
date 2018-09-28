@@ -26,6 +26,10 @@ class App extends Component {
         <Toolbar 
           undo={this.undo}
           undoDisabled={this.state.undoDisabled}
+          clear={() => this.wipe(this.state.canvas, this.state.context)}
+          rotate={this.rotate}
+          flipV={this.flipVertical}
+          flipH={this.flipHorizontal}
         />
         <div id='workspace'>
           <Sketchpad 
@@ -75,17 +79,27 @@ class App extends Component {
     context.clearRect(0, 0, canvas.width, canvas.height)
   }
 
+  //Makes a copy of the current canvas state
+  saveCanvas = () => {
+    let {copyCanvas, copyContext, canvas} = this.state
+    this.wipe(copyCanvas, copyContext)
+    copyContext.drawImage(canvas, 0, 0)
+  }
+
+  //Restores canvas to saved version
+  restoreCanvas = () => {
+    let {canvas, context, copyCanvas} = this.state
+    this.wipe(canvas, context)
+    context.drawImage(copyCanvas, 0, 0)
+  }
+
   //Activates on MouseDown event
   beginDrawing = (e) => {
     let coords = this.getCoords(e)
     let {context} = this.state
     context.beginPath()
     context.moveTo(coords.x, coords.y)
-
-    //Makes copy of the canvas before the drawing takes place
-    let {copyContext, canvas} = this.state
-    copyContext.drawImage(canvas, 0, 0)
-
+    this.saveCanvas()
     this.setState({drawing: true, startCoords: coords, undoDisabled: false})
 
     if(this.state.tool === 'fill') {
@@ -135,9 +149,8 @@ class App extends Component {
 
   //At each update, resets canvas from one stored in memory with the rectangle drawn on top
   rectangle = ({x, y}) => {
-    let {canvas, context, copyCanvas, startCoords} = this.state
-    this.wipe(canvas, context)
-    context.drawImage(copyCanvas, 0, 0)
+    let {context, startCoords} = this.state
+    this.restoreCanvas()
     context.beginPath()
     context.rect(startCoords.x, startCoords.y, x - startCoords.x, y - startCoords.y)
     context.fill()
@@ -145,9 +158,8 @@ class App extends Component {
 
   //At each update, resets canvas from one stored in memory with the rectangle drawn on top
   circle = ({ x, y}) => {
-    let {canvas, context, copyCanvas, startCoords} = this.state
-    this.wipe(canvas, context)
-    context.drawImage(copyCanvas, 0, 0)
+    let {context, startCoords} = this.state
+    this.restoreCanvas()
     context.beginPath()
     let centerX = (startCoords.x + x) / 2
     let centerY = (startCoords.y + y) / 2
@@ -236,18 +248,62 @@ class App extends Component {
   }
   updateTool = (value) => {
     this.setState({tool: value})
-    let {copyContext, canvas} = this.state
-    copyContext.drawImage(canvas, 0, 0)
   }
 
   undo = () => {
     console.log('test')
     if(!this.state.undoDisabled) {
-      const {canvas, context, copyCanvas} = this.state
-      this.wipe(canvas, context)
-      context.drawImage(copyCanvas, 0, 0)
+      this.restoreCanvas()
       this.setState({undoDisabled: true})
     }
+  }
+
+  rotate = () => {
+    let {canvas, context} = this.state
+    this.saveCanvas()
+    context.translate(canvas.width / 2, canvas.height / 2)
+    context.rotate(Math.PI / 2)
+    context.translate(-canvas.width / 2, -canvas.height / 2)
+    this.restoreCanvas()
+    context.translate(canvas.width / 2, canvas.height / 2)
+    context.rotate(-Math.PI / 2)
+    context.translate(-canvas.width / 2, -canvas.height / 2)
+  }
+
+  flipVertical = () => {
+    this.saveCanvas()
+    let {canvas, context} = this.state 
+    let image = context.getImageData(0, 0, canvas.width, canvas.height)
+    let newImage = context.createImageData(canvas.width, canvas.height)
+    const rowLength = canvas.width * 4
+    //Cannot mutate image data, it must be changed individually
+    for(let row = 0; row < canvas.height; row++) {
+      for(let col = 0; col < rowLength; col++) {
+        newImage.data[(canvas.height - 1 - row) * rowLength + col] = image.data[rowLength * row + col]
+      }
+    }
+    this.wipe(canvas, context)
+    context.putImageData(newImage, 0, 0)
+  }
+
+  flipHorizontal = () => {
+    this.saveCanvas()
+    let {canvas, context} = this.state
+    let image = context.getImageData(0, 0, canvas.width, canvas.height)
+    let newImage = context.createImageData(canvas.width, canvas.height)
+    const rowLength = canvas.width * 4
+    //Cannot mutate image data, it must be changed individually
+    for(let row = 0; row < canvas.height; row++) {
+      let currentRow = image.data.slice(row * rowLength, (row + 1) * rowLength)
+      currentRow = _.chunk(currentRow, 4)
+      currentRow.reverse()
+      currentRow = _.flatten(currentRow)
+      for(let col = 0; col < currentRow.length; col++) {
+        newImage.data[row * rowLength + col] = currentRow[col]
+      }
+    }
+    this.wipe(canvas, context)
+    context.putImageData(newImage, 0, 0)
   }
 }
 

@@ -36,6 +36,10 @@ class Toolbar extends Component {
 			        selected={this.state.dropDownTarget}
 			        undo={this.props.undo}
 			        undoDisabled={this.props.undoDisabled}
+			        clear={this.props.clear}
+			        rotate={this.props.rotate}
+			        flipV={this.props.flipV}
+			        flipH={this.props.flipH}
 			    />
 			</div>
 		)
