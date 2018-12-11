@@ -40,6 +40,7 @@ class Toolbar extends Component {
 			        rotate={this.props.rotate}
 			        flipV={this.props.flipV}
 			        flipH={this.props.flipH}
+			        download={this.props.download}
 			    />
 			</div>
 		)

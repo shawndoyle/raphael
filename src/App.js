@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
+import download from 'downloadjs'
 import Toolbar from './components/Toolbar/Toolbar'
 import Sketchpad from './components/Sketchpad/Sketchpad'
 import PaintMenu from './components/PaintMenu/PaintMenu'
@@ -30,6 +31,7 @@ class App extends Component {
           rotate={this.rotate}
           flipV={this.flipVertical}
           flipH={this.flipHorizontal}
+          download={this.download}
         />
         <div id='workspace'>
           <Sketchpad 
@@ -304,6 +306,12 @@ class App extends Component {
     }
     this.wipe(canvas, context)
     context.putImageData(newImage, 0, 0)
+  }
+
+  download = () => {
+    const {canvas} = this.state
+    const dataURL = canvas.toDataURL()
+    download(dataURL, 'masterpiece.png', 'image/png')
   }
 }
 

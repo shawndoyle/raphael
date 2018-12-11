@@ -1,14 +1,14 @@
 import React from 'react'
 import './DropDown.css'
 
-const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH}) => {
+const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, download}) => {
 	if(selected === 'File') {
 		return(
 			<nav id='drop-down-menu'>
 				<ul>
 					<li 
 						key='Download'
-						onClick={console.log}
+						onClick={download}
 					>Download</li>
 					<li 
 						key='New'
