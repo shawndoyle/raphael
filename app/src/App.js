@@ -90,9 +90,9 @@ class App extends Component {
 
   //Restores canvas to saved version
   restoreCanvas = () => {
-    let {canvas, context, copyCanvas} = this.state
-    this.wipe(canvas, context)
-    context.drawImage(copyCanvas, 0, 0)
+    let {canvas, context, copyCanvas} = this.state;
+    this.wipe(canvas, context);
+    context.drawImage(copyCanvas, 0, 0);
   }
 
   //Activates on MouseDown event
@@ -253,7 +253,6 @@ class App extends Component {
   }
 
   undo = () => {
-    console.log('test')
     if(!this.state.undoDisabled) {
       this.restoreCanvas()
       this.setState({undoDisabled: true})
