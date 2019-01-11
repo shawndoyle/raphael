@@ -1,3 +1,5 @@
+require('./config/config.js');
+
 //Libraries
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -11,7 +13,7 @@ const {User} = require('./models/User.js');
 const {authenticate} = require('./middleware/authenticate.js');
 
 //Constants
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 const app = express();
 
 //Middleware

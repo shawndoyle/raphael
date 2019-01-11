@@ -1,0 +1,12 @@
+{
+	"test": {
+		"PORT": 3000,
+		"MONGODB_URI": "mongodb://localhost:27017/RaphaelTesting",
+		"JWT_SECRET": "lkjasfienkswek3452ejn2ejfn"
+	},
+	"development": {
+		"PORT": 3000,
+		"MONGODB_URI": "mongodb://localhost:27017/Raphael",
+		"JWT_SECRET": "23kjfa0vn9ro4i3nl2dkwoe329ncl"
+	}
+}
