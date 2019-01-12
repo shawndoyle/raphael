@@ -1,0 +1,55 @@
+#login-card {
+	background: #692C06;
+	max-width: 300px;
+	margin: 100px auto;
+	border-radius: 20px;
+	padding: 20px;
+	color: white;
+	font-size: 20px;
+}
+
+#login-card h3 {
+	text-align: center;
+}
+
+#login-card h4 {
+	margin-bottom: 0;
+}
+
+.input {
+	width: 90%;
+}
+
+#login-card button {
+	margin-top: 30px;
+	width: 100%;
+	background: #AA5927;
+	border: 0px;
+	border-radius: 10px;
+	color: #EEE;
+	font-size: 1.2em;
+	padding: 0;
+}
+
+button:hover, #login-card h5:hover {
+	cursor: pointer;
+}
+
+#login-card button h3 {
+	margin: 10px;
+	color: 
+}
+
+#login-card h5 {
+	text-decoration: underline;
+	text-align: right;
+	color: #1B764D;
+	margin-bottom: 0;
+}
+
+#error-msg {
+	padding: 10px;
+	color: red;
+	font-family: monospace;
+	font-size: 0.8em;
+}

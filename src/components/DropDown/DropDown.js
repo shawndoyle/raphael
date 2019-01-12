@@ -33,7 +33,7 @@ const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, do
 					<li 
 						key='Undo'
 						onClick={undo}
-						style={undoDisabled ? {color: '#000', cursor: 'default'} : {}}
+						style={undoDisabled ? {color: 'grey', cursor: 'default'} : {}}
 					>Undo</li>
 					<li 
 						key='Rotate'
@@ -67,6 +67,10 @@ const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, do
 						key='Account-Settings'
 						onClick={console.log}
 					>Account Settings</li>
+					<li 
+						key='Logout'
+						onClick={console.log}
+					>Logout</li>
 				</ul>
 			</nav>
 		)

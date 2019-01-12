@@ -4,12 +4,15 @@ import download from 'downloadjs'
 import Toolbar from './components/Toolbar/Toolbar'
 import Sketchpad from './components/Sketchpad/Sketchpad'
 import PaintMenu from './components/PaintMenu/PaintMenu'
+import LoginCard from './components/LoginCard/LoginCard'
+import RegisterCard from './components/RegisterCard/RegisterCard'
 import './App.css'
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
+      route: 'register',
       drawing: false,
       tool: null,
       brushSize: 10,
@@ -22,50 +25,62 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <div className="App">
-        <Toolbar 
-          undo={this.undo}
-          undoDisabled={this.state.undoDisabled}
-          clear={() => this.wipe(this.state.canvas, this.state.context)}
-          rotate={this.rotate}
-          flipV={this.flipVertical}
-          flipH={this.flipHorizontal}
-          download={this.download}
-        />
-        <div id='workspace'>
-          <Sketchpad 
-            draw={this.draw}
-            beginDrawing={this.beginDrawing}
-            endDrawing={this.endDrawing}
+    if(this.state.route === 'app') {
+      return (
+        <div className="App">
+          <Toolbar 
+            undo={this.undo}
+            undoDisabled={this.state.undoDisabled}
+            clear={() => this.wipe(this.state.canvas, this.state.context)}
+            rotate={this.rotate}
+            flipV={this.flipVertical}
+            flipH={this.flipHorizontal}
+            download={this.download}
           />
-          <PaintMenu
-            color={this.state.color}
-            brushSize={this.state.brushSize}
-            updateColor={this.updateColor}
-            updateBrushSize={this.updateBrushSize}
-            updateTool={this.updateTool}
-            disableSlider={this.state.tool === 'circle' || this.state.tool === 'rectangle' || this.state.tool === 'fill'}
-          />
+          <div id='workspace'>
+            <Sketchpad 
+              draw={this.draw}
+              beginDrawing={this.beginDrawing}
+              endDrawing={this.endDrawing}
+            />
+            <PaintMenu
+              color={this.state.color}
+              brushSize={this.state.brushSize}
+              updateColor={this.updateColor}
+              updateBrushSize={this.updateBrushSize}
+              updateTool={this.updateTool}
+              disableSlider={this.state.tool === 'circle' || this.state.tool === 'rectangle' || this.state.tool === 'fill'}
+            />
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else if(this.state.route === 'login') {
+      return (
+        <LoginCard changeRoute={this.changeRoute} />
+      );
+    } else if(this.state.route === 'register') {
+      return (
+        <RegisterCard changeRoute={this.changeRoute} />
+      );
+    }
   }
 
   componentDidMount() {
-      //Init canvas
-      const canvas = document.querySelector('#canvas')
-      const context = canvas.getContext('2d')
-      context.lineWidth = 10
-      //Init copyCanvas
-      const copyCanvas = document.createElement('canvas')
-      copyCanvas.width = '600'
-      copyCanvas.height = '600'
-      const copyContext = copyCanvas.getContext('2d')
+      if(this.state.route === 'app') {
+        //Init canvas
+        const canvas = document.querySelector('#canvas')
+        const context = canvas.getContext('2d')
+        context.lineWidth = 10
+        //Init copyCanvas
+        const copyCanvas = document.createElement('canvas')
+        copyCanvas.width = '600'
+        copyCanvas.height = '600'
+        const copyContext = copyCanvas.getContext('2d')
 
-      document.querySelector('body').appendChild(copyCanvas) //DELETE THIS LATER
+        // document.querySelector('body').appendChild(copyCanvas) //DELETE THIS LATER
 
-      this.setState({ canvas, context, copyCanvas, copyContext })
+        this.setState({ canvas, context, copyCanvas, copyContext });
+      }
   }
 
   //Translates MouseEvent coordinates to coordinates on the canvas
@@ -310,7 +325,11 @@ class App extends Component {
   download = () => {
     const {canvas} = this.state
     const dataURL = canvas.toDataURL()
-    download(dataURL, 'masterpiece.png', 'image/png')
+    download(dataURL, 'MyCanvas.png', 'image/png')
+  }
+
+  changeRoute = (route) => {
+    this.setState({route});
   }
 }
 

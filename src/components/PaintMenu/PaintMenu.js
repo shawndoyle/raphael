@@ -85,14 +85,3 @@ const PaintMenu = ({color, brushSize, updateColor, updateBrushSize, updateTool, 
 }
 
 export default PaintMenu
-
-/*
-Tool Select
-	Rectangles
-	Circle
-	Brush
-	Erase
-	Fill
-Slider - Brush size
-Color picker
-*/

@@ -1,5 +1,12 @@
+body, html {
+  height: 100%;
+  background: #1B764D;
+}
+
+
 .App {
   text-align: center;
+  height: 100%;
 }
 
 #workspace {
@@ -7,12 +14,11 @@
   margin: 15px;
   padding: 20px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
 }
 
-.shadow {
-  -webkit-box-shadow: 3px 3px 3px 3px #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
-  -moz-box-shadow:    3px 3px 3px 3px #ccc;  /* Firefox 3.5 - 3.6 */
-  box-shadow:         5px 5px 3px 3px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+
+canvas {
+  background: #FFF;
 }
