@@ -16,7 +16,7 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      route: 'app',
+      route: 'login',
       drawing: false,
       tool: null,
       brushSize: 10,
