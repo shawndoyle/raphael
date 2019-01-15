@@ -3,6 +3,12 @@
 	margin: 0;
 }
 
+#current-file {
+	float: right;
+	padding-right: 20px;
+	color: #BBB;
+}
+
 #nav-links {
 	display: table-row;
 

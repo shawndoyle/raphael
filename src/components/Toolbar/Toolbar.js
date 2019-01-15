@@ -23,9 +23,11 @@ class Toolbar extends Component {
 	}
 
 	render() {
+		const fileName = this.props.file ? this.props.file.name : 'Untitled';
 		return (
 			<div>
 				<nav id='toolbar'>
+					<h3 id='current-file'><i>{fileName}</i></h3>
 					<ul onClick={this.updateDropDown} id='nav-links'>
 						<li>File</li>
 						<li>Edit</li>
@@ -41,6 +43,10 @@ class Toolbar extends Component {
 			        flipV={this.props.flipV}
 			        flipH={this.props.flipH}
 			        download={this.props.download}
+			        logout={this.props.logout}
+			        save={this.props.save}
+			        open={this.props.open}
+			        newFile={this.props.newFile}
 			    />
 			</div>
 		)

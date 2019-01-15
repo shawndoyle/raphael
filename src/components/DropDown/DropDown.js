@@ -1,7 +1,7 @@
 import React from 'react'
 import './DropDown.css'
 
-const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, download}) => {
+const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, download, logout, save, open, newFile}) => {
 	if(selected === 'File') {
 		return(
 			<nav id='drop-down-menu'>
@@ -12,15 +12,15 @@ const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, do
 					>Download</li>
 					<li 
 						key='New'
-						onClick={console.log}
+						onClick={newFile}
 					>New</li>
 					<li 
 						key='Open'
-						onClick={console.log}
+						onClick={open}
 					>Open</li>
 					<li 
 						key='Save'
-						onClick={console.log}
+						onClick={save}
 					>Save</li>
 				</ul>
 			</nav>
@@ -61,15 +61,11 @@ const DropDown = ({selected, undo, undoDisabled, rotate, clear, flipV, flipH, do
 				<ul>
 					<li 
 						key='View-Files'
-						onClick={console.log}
+						onClick={open}
 					>View Files</li>
 					<li 
-						key='Account-Settings'
-						onClick={console.log}
-					>Account Settings</li>
-					<li 
 						key='Logout'
-						onClick={console.log}
+						onClick={logout}
 					>Logout</li>
 				</ul>
 			</nav>

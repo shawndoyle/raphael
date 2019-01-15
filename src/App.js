@@ -1,18 +1,22 @@
 import React, {Component} from 'react'
 import _ from 'lodash'
 import download from 'downloadjs'
+import Modal from 'react-responsive-modal'
+
 import Toolbar from './components/Toolbar/Toolbar'
 import Sketchpad from './components/Sketchpad/Sketchpad'
 import PaintMenu from './components/PaintMenu/PaintMenu'
 import LoginCard from './components/LoginCard/LoginCard'
 import RegisterCard from './components/RegisterCard/RegisterCard'
+import FileMenu from './components/FileMenu/FileMenu'
+import {serverURL} from './config/config.json'
 import './App.css'
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
-      route: 'register',
+      route: 'app',
       drawing: false,
       tool: null,
       brushSize: 10,
@@ -20,7 +24,15 @@ class App extends Component {
         hex: '#000',
         rgb: { r:0, g:0, b:0, a:0 }
       },
+      file: null,
       undoDisabled: true,
+      errorModalOpen: false,
+      errorModalMsg: 'This is the modal',
+      saveModalOpen: false,
+      saveModalText: 'Save Canvas:',
+      saved: true,
+      saveCheckModal: false,
+      saveCheckModalAction: null,
     }
   }
 
@@ -36,12 +48,18 @@ class App extends Component {
             flipV={this.flipVertical}
             flipH={this.flipHorizontal}
             download={this.download}
+            logout={this.logout}
+            save={this.save}
+            open={this.openFileMenuHandler}
+            file={this.state.file}
+            newFile={this.createNewFileHandler}
           />
           <div id='workspace'>
             <Sketchpad 
               draw={this.draw}
               beginDrawing={this.beginDrawing}
               endDrawing={this.endDrawing}
+              init={this.init}
             />
             <PaintMenu
               color={this.state.color}
@@ -52,7 +70,33 @@ class App extends Component {
               disableSlider={this.state.tool === 'circle' || this.state.tool === 'rectangle' || this.state.tool === 'fill'}
             />
           </div>
+
+          <Modal open={this.state.errorModalOpen} onClose={this.onCloseErrorModal} center>
+            <h2>{this.state.errorModalMsg}</h2>
+          </Modal>
+
+          <Modal open={this.state.saveModalOpen} onClose={this.onCloseSaveModal}>
+            <h2>{this.state.saveModalText}</h2>
+            <span>Enter name:&nbsp;<input id='save-name' onKeyPress={this.onSaveModalKeypress}></input></span>
+            <button onClick={this.saveBtn}>Save</button>
+          </Modal>
+
+          <Modal open={this.state.saveCheckModal} onClose={this.onCloseSaveCheckModal}>
+            <h2>You haven't saved your canvas</h2>
+            <button onClick={this.closeSaveModalCheckAndSave}>Save</button>
+            &nbsp;<button onClick={this.closeSaveModalCheckDontSave}>Don't save</button>
+          </Modal>
         </div>
+      );
+    } else if(this.state.route === 'open') {
+      return (
+        <FileMenu 
+          close={this.closeFileMenu}
+          files={this.state.allFiles}
+          loadFile={this.loadFile}
+          currentFile={this.state.file}
+          deleteCurrentFile={this.deleteCurrentFile}
+        />
       );
     } else if(this.state.route === 'login') {
       return (
@@ -65,22 +109,97 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
-      if(this.state.route === 'app') {
-        //Init canvas
-        const canvas = document.querySelector('#canvas')
-        const context = canvas.getContext('2d')
-        context.lineWidth = 10
-        //Init copyCanvas
-        const copyCanvas = document.createElement('canvas')
-        copyCanvas.width = '600'
-        copyCanvas.height = '600'
-        const copyContext = copyCanvas.getContext('2d')
+  init = () => {
+    console.log('init');
+    const canvas = document.querySelector('#canvas');
+    const context = canvas.getContext('2d');
+    context.lineWidth = 10;
 
-        // document.querySelector('body').appendChild(copyCanvas) //DELETE THIS LATER
-
-        this.setState({ canvas, context, copyCanvas, copyContext });
+    if(this.state.canvas) {
+      const oldCanvas = this.state.canvas;
+      context.drawImage(oldCanvas, 0, 0);
+    }
+    
+    if(this.state.file) {
+      let img = new Image();
+      img.onload = function () {
+        context.drawImage(img, 0, 0);
       }
+      img.src = this.state.file.dataURL;
+    }
+
+    //Init copyCanvas
+    const copyCanvas = document.createElement('canvas')
+    copyCanvas.width = '600'
+    copyCanvas.height = '600'
+    const copyContext = copyCanvas.getContext('2d')
+    
+    this.setState({canvas, context, copyContext, copyCanvas});
+  }
+
+  reset = () => {
+    this.setState({
+      canvas: undefined,
+      context: undefined,
+      copyCanvas: undefined,
+      copyContext: undefined,
+      drawing: false,
+      tool: null,
+      brushSize: 10,
+      color: {
+        hex: '#000',
+        rgb: { r:0, g:0, b:0, a:0 }
+      },
+      file: null,
+      undoDisabled: true,
+      errorModalOpen: false,
+      errorModalMsg: 'This is the modal',
+      saveModalOpen: false,
+      saveModalText: 'Save Canvas:',
+      saved: true,
+      saveCheckModal: false,
+      saveCheckModalAction: null,
+    })
+
+  }
+
+  //Opens modal with message
+  sendErrorModalMessage = (msg) => {
+    this.setState({
+      errorModalOpen: true,
+      errorModalMsg: msg
+    });
+  }
+
+  onCloseErrorModal = () => {
+    this.setState({
+      errorModalOpen: false,
+      errorModalMsg: ''
+    })
+  }
+
+  onCloseSaveModal = () => {
+    this.setState({saveModalOpen: false});
+  }
+
+  onSaveModalKeypress = (e) => {
+    if(e.charCode === 13) {
+      this.saveBtn();
+    }
+  }
+
+  onCloseSaveCheckModal = () => {
+    this.setState({saveCheckModal: false, saveCheckModalAction: null});
+  }
+
+  closeSaveModalCheckAndSave = () => {
+    this.save();
+    this.setState({saveCheckModal:false, saveCheckModalAction: null});
+  }
+
+  closeSaveModalCheckDontSave = () => {
+    let action = this.state.saveCheckModalAction;
+    this.setState({saveCheckModal: false, saveCheckModalAction: null}, action);
   }
 
   //Translates MouseEvent coordinates to coordinates on the canvas
@@ -117,7 +236,7 @@ class App extends Component {
     context.beginPath()
     context.moveTo(coords.x, coords.y)
     this.saveCanvas()
-    this.setState({drawing: true, startCoords: coords, undoDisabled: false})
+    this.setState({drawing: true, startCoords: coords, undoDisabled: false, saved: false})
 
     if(this.state.tool === 'fill') {
       this.fill(coords)
@@ -275,6 +394,7 @@ class App extends Component {
   }
 
   rotate = () => {
+    this.setState({saved: false});
     let {canvas, context} = this.state
     this.saveCanvas()
     context.translate(canvas.width / 2, canvas.height / 2)
@@ -287,6 +407,7 @@ class App extends Component {
   }
 
   flipVertical = () => {
+    this.setState({saved: false});
     this.saveCanvas()
     let {canvas, context} = this.state 
     let image = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -303,6 +424,7 @@ class App extends Component {
   }
 
   flipHorizontal = () => {
+    this.setState({saved: false});
     this.saveCanvas()
     let {canvas, context} = this.state
     let image = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -323,13 +445,160 @@ class App extends Component {
   }
 
   download = () => {
-    const {canvas} = this.state
-    const dataURL = canvas.toDataURL()
-    download(dataURL, 'MyCanvas.png', 'image/png')
+    const {canvas} = this.state;
+    const name = this.state.file ? this.state.file.name : 'MyCanvas';
+    const dataURL = canvas.toDataURL();
+    download(dataURL, `${name}.png`, 'image/png');
   }
 
   changeRoute = (route) => {
     this.setState({route});
+  }
+
+  logout = () => {
+    let token = localStorage.getItem('MyCanvasToken');
+    const fetchData = {
+      method: 'DELETE',
+      mode: 'cors',
+      headers: {
+        'x-auth': token
+      }
+    };
+    fetch(serverURL + '/users/logout', fetchData)
+    .then(res => {
+      if(res.status !== 200) {
+        return Promise.reject();
+      }
+      this.changeRoute('login');
+      localStorage.removeItem('MyCanvasToken');
+      this.reset();
+    })
+    .catch(e => {
+      this.sendErrorModalMessage('Error logging out:', e);
+    });
+  }
+
+  save = () => {
+    if(this.state.file) {
+      let token = localStorage.getItem('MyCanvasToken');
+      let {_id} = this.state.file;
+      let dataURL = this.state.canvas.toDataURL();
+      let data = JSON.stringify({dataURL});
+      const fetchData = {
+        method: 'PATCH',
+        mode: 'cors',
+        headers: {
+          'x-auth': token,
+          'Content-Type': 'application/json'
+        },
+        body: data
+      };
+      fetch(`${serverURL}/files/${_id}`, fetchData)
+      .then(res => {
+        if(res.status !== 200) {
+          return Promise.reject();
+        }
+        return res.json();
+      })
+      .then(json => {
+        this.setState({file: json.file, saved: true});
+        this.sendErrorModalMessage('Save successful!');
+      })
+      .catch(e => {
+        this.sendErrorModalMessage('Error: Unable to save to server');
+      });
+    } else {
+      this.setState({saveModalOpen: true, saveModalText: 'Save Canvas:'});
+    }
+  }
+
+  saveBtn = () => {
+    let token = localStorage.getItem('MyCanvasToken');
+    let name = document.querySelector('#save-name').value;
+    let dataURL = this.state.canvas.toDataURL();
+    let data = JSON.stringify({name, dataURL});
+    const fetchData = {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'x-auth': token,
+        'Content-Type': 'application/json'
+      },
+      body: data
+    };
+    fetch(serverURL + '/files', fetchData)
+    .then(res => {
+      if(res.status !== 200) {
+        return Promise.reject()
+      }
+      return res.json();
+    })
+    .then(json => {
+      this.setState({
+        file: json,
+        saveModalOpen: false,
+        saved: true
+      });
+      this.sendErrorModalMessage('Save successful!');
+    })
+    .catch(e => {
+      this.setState({saveModalOpen: false});
+      this.sendErrorModalMessage('Error: Unable to save to server');
+    })
+  }
+
+  openFileMenuHandler = () => {
+    if(this.state.saved) {
+      this.openFileMenu()
+    } else {
+      this.setState({
+        saveCheckModal: true,
+        saveCheckModalAction: this.openFileMenu
+      });
+    }
+  }
+
+  openFileMenu = () => {
+    this.setState({route: 'open'});
+  }
+  closeFileMenu = () => {
+    this.setState({
+      route: 'app',
+      saveCheckModal: false,
+    });
+
+    console.log(this.state);
+  }
+
+  loadFile = (file) => {
+    this.setState({
+      route: 'app',
+      canvas: undefined, 
+      file
+    });
+  }
+
+  createNewFileHandler = () => {
+    if(this.state.saved) {
+      this.createNewFile()
+    } else {
+      this.setState({
+        saveCheckModal: true,
+        saveCheckModalAction: this.createNewFile
+      });
+    }
+  }
+
+  createNewFile = () => {
+    let {canvas, context} = this.state;
+    this.wipe(canvas, context);
+    this.setState({saveModalOpen: true, saveModalText: 'New Canvas:'});
+  }
+
+  deleteCurrentFile = () => {
+    let {canvas, context} = this.state;
+    this.setState({file: null});
+    this.wipe(canvas, context);
   }
 }
 

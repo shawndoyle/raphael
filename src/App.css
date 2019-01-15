@@ -1,4 +1,5 @@
 body, html {
+  overflow: auto;
   height: 100%;
   background: #1B764D;
 }

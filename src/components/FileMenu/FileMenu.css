@@ -1,0 +1,44 @@
+#file-menu {
+	background: #692C06;
+	max-width: 800px;
+	margin: 100px auto;
+	border-radius: 20px;
+	padding: 20px;
+	color: white;
+	font-size: 20px;
+	padding-bottom: 40px;
+}
+
+#close-btn {
+	float: right;
+	font-size: 1.5em;
+	cursor: pointer;
+}
+
+#file-menu table {
+	max-width: 750px;
+	background: #E4874E;
+	color: black;
+}
+
+#file-menu td {
+	border-bottom: 1px solid grey;
+	padding: 4px;
+}
+
+#file-menu th {
+	border-bottom: 1px solid black;
+}
+
+.wide {
+	width: 300px;
+}
+
+.thin {
+	width: 100px;
+}
+
+.loader {
+	display: flex;
+	justify-content: center;
+}
